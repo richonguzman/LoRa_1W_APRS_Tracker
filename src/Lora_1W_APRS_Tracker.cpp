@@ -15,12 +15,12 @@ https://github.com/sh123/esp32_loraprs
 #include <WiFi.h>
 #include <OneButton.h>
 #include "BeaconManager.h"
-#include "pins.h"
+#include "pins_conection.h"
 #include "lora_config.h"
 #include "beacon_config.h"
 #include "configuration.h"
 
-#define VERSION "2023.01.28"		// BETA still!!!
+#define VERSION "2023.01.29"		// BETA still!!!
 
 SX1268				radio = new Module(NSS, DIO1, NRST, BUSY);
 HardwareSerial		neo6m_gps(1);
@@ -32,19 +32,18 @@ BeaconManager 		BeaconMan;
 static bool send_update = true;
 
 void load_config() {
-  ConfigurationManagement confmg("/tracker.json");
-  Config = confmg.readConfiguration();
-  BeaconMan.loadConfig(Config.beacons);
-  if (BeaconMan.getCurrentBeaconConfig()->callsign == "NOCALL-10") {
-	Serial.println("You have to change your settings in 'data/tracker.json' and "
-                "upload it via \"Upload File System image\"!");
-    while (true) {
-    }
-  } else {
-	Serial.println("#####   (Configuration Loaded)   #####");
-  }
+	ConfigurationManagement confmg("/tracker.json");
+	Config = confmg.readConfiguration();
+	BeaconMan.loadConfig(Config.beacons);
+	if (BeaconMan.getCurrentBeaconConfig()->callsign == "NOCALL-10") {
+		Serial.println("You have to change your settings in 'data/tracker.json' and "
+			"upload it via \"Upload File System image\"!");
+		while (true) {
+		}
+	} else {
+		Serial.println(" (Configuration Loaded)");
+	}
 }
-
 
 void setup_lora_module() {
 	int state = radio.begin(LoraFreqTx, LoraBandWidth, LoraSpreadingFactor, LoraCodingRate, LoraSyncWord, LoraOutro, LoraPreampbleLenght);
@@ -77,9 +76,9 @@ void setup() {
 	Serial.begin(115200);
 	pinMode(LED_BUILTIN, OUTPUT);
 	digitalWrite(LED_BUILTIN, LOW);
+	Serial.print("LoRa APRS tracker"); // __DATE__ " " __TIME__);
 	load_config();
-	Serial.print("LoRa tracker " __DATE__ " " __TIME__ " / Callsign ------> ");
-	Serial.println(BeaconMan.getCurrentBeaconConfig()->callsign);
+	Serial.println("________________________________________");
 	setup_lora_module();
 	setup_gps_module();
 	UserButton1.attachClick(ForcedBeaconTx);
@@ -87,6 +86,8 @@ void setup() {
 	WiFi.mode(WIFI_OFF);
 	btStop();
 	Serial.print("(Version = "); Serial.print(VERSION);	Serial.println(")");
+	Serial.print(" / Callsign ---> ");
+	Serial.println(BeaconMan.getCurrentBeaconConfig()->callsign);
 	Serial.println("Transmission Start ---->");
 }
 

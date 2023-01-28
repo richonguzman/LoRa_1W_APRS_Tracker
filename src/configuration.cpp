@@ -59,15 +59,17 @@ Configuration ConfigurationManagement::readConfiguration() {
     conf.beacons.push_back(beacon);
   }
 
+  /*
   conf.button.tx          = data["button"]["tx"] | false;
   conf.button.alt_message = data["button"]["alt_message"] | false;
 
-  conf.lora.frequencyRx     = data["lora"]["frequency_rx"] | 433775000;
-  conf.lora.frequencyTx     = data["lora"]["frequency_tx"] | 433775000;
+  conf.lora.frequencyRx     = data["lora"]["frequency_rx"] | 433775;
+  conf.lora.frequencyTx     = data["lora"]["frequency_tx"] | 433775;
   conf.lora.power           = data["lora"]["power"] | 20;
   conf.lora.spreadingFactor = data["lora"]["spreading_factor"] | 12;
-  conf.lora.signalBandwidth = data["lora"]["signal_bandwidth"] | 125000;
+  conf.lora.signalBandwidth = data["lora"]["signal_bandwidth"] | 125;
   conf.lora.codingRate4     = data["lora"]["coding_rate4"] | 5;
+  */
 
   return conf;
 }
@@ -102,8 +104,10 @@ void ConfigurationManagement::writeConfiguration(Configuration conf) {
     v["enhance_precision"] = beacon.enhance_precision;
   }
 
+  
   data["debug"] = conf.debug;
 
+  /* 
   data["button"]["tx"]          = conf.button.tx;
   data["button"]["alt_message"] = conf.button.alt_message;
 
@@ -113,7 +117,8 @@ void ConfigurationManagement::writeConfiguration(Configuration conf) {
   data["lora"]["spreading_factor"] = conf.lora.spreadingFactor;
   data["lora"]["signal_bandwidth"] = conf.lora.signalBandwidth;
   data["lora"]["coding_rate4"]     = conf.lora.codingRate4;
-
+  */
+  
   serializeJson(data, file);
   file.close();
 }

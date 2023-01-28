@@ -38,9 +38,9 @@ public:
     bool         enhance_precision;
   };
 
-  class LoRa {
+  /*class LoRa {
   public:
-    LoRa() : frequencyRx(433775000), frequencyTx(433775000), power(20), spreadingFactor(12), signalBandwidth(125000), codingRate4(5) {
+    LoRa() : frequencyRx(433775), frequencyTx(433775), power(20), spreadingFactor(12), signalBandwidth(125), codingRate4(5) {
     }
 
     long frequencyRx;
@@ -59,14 +59,16 @@ public:
     bool tx;
     int  alt_message;
   };
-
+  */
+  
   Configuration() : debug(false) {
   }
 
   bool              debug;
   std::list<Beacon> beacons;
-  LoRa              lora;
-  Button            button;
+  //LoRa              lora;
+  //Button            button;
+  
 };
 
 class ConfigurationManagement {

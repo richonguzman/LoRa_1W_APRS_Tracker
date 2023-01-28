@@ -1,4 +1,5 @@
 {
+	"debug": false,
 	"beacons": [
         {
 			"callsign": "CD2RXU-7",
@@ -52,11 +53,11 @@
 
 	],
     "lora": {
-        "frequency_rx": 433775000,
-        "frequency_tx": 433775000,
+        "frequency_rx": 433775,
+        "frequency_tx": 433775,
         "power": 20,
         "spreading_factor": 12,
-        "signal_bandwidth": 125000,
+        "signal_bandwidth": 125.0,
         "coding_rate4": 5
     }
 }
