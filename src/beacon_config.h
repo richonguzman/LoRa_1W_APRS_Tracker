@@ -6,7 +6,7 @@
 #define AprsOverlay             "/"
 #define SendAltitude            true        // "true" adds Altitude to the APRS packet/message, "false" add Course+Speed
 #define SendComment             true        // "true" adds comment to the APRS packet/message
-#define APRS_COMMENT            "Lora Tracker 1W"   // To send this comment --> SendComment = true (edit the comment as you like)
+#define APRS_COMMENT            "https://github.com/richonguzman/LoRa_1W_APRS_Tracker"   // To send this comment --> SendComment = true (edit the comment as you like)
 
 #define User1_Callsign          "CD2RXU-7"  // This is my Callsign , so go on and change it to yours!!!
 #define User1_Symbol            "["         // Runner
