@@ -115,7 +115,8 @@ void setup() {
 }
 
 uint8_t  tx_buffer[256];
-uint32_t lastTxTime = 0;
+uint32_t lastTxTime 		= 0;
+uint32_t lastCommentTxTime 	= 0;
 
 char *ax25_base91enc(char *s, uint8_t n, uint32_t v) {
 	/* Creates a Base-91 representation of the value in v in the string */
@@ -144,6 +145,7 @@ void loop() {
 	static double   lastTxLongitude = 0.0;
 	static double   lastTxDistance  = 0.0;
 	static uint32_t txInterval      = 60000L;
+	uint32_t txCommentInterval      = 15*60*1000;
 	int CurrentSpeed 				= (int)gps.speed.kmph();
 	//static int      speed_zero_sent = 0;
 
@@ -241,8 +243,14 @@ void loop() {
 		}
 
 		if (SendComment) {
-			//AprsPacketMsg += APRS_COMMENT;
-			AprsPacketMsg += mensaje_test;
+			uint32_t lastCommentTx = millis() - lastCommentTxTime;
+			if (lastCommentTx >= txCommentInterval) {
+				AprsPacketMsg += AprsComment;
+				lastCommentTxTime = millis();
+			} else {
+				AprsPacketMsg += mensaje_test;  //esto es solo para validar giro distancia y otras cosas
+			}
+
 		}
 
 		Serial.print(F("GPS coordinates: ")); 				// Only for Serial Monitor
