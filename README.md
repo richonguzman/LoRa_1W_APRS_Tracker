@@ -17,7 +17,7 @@ Achievements:
 - send enconded GPS data packet for shorter and realiable comunication.
 - Select to send "Course + Speed" or "Altitude + Speed" in encoded APRS data packet.
 - Use SmartBeacon with "Turn_Min + Turn_Slope" formula.
-- Zero Message when standing still for a while (not sending beacons and saving battery)
+- Smartbeacon now sends packet normally when moving, once per 15min (first hour) when standing still and then only one packet per hour (not sending beacons = saving battery + less innecesary packets Air)
 
 To add (shortly) working on it
 
