@@ -11,7 +11,7 @@ https://github.com/richonguzman/LoRa_1W_APRS_Tracker
 #include "lora_config.h"
 #include "beacon_config.h"
 
-#define VERSION "V0.1.2"	//2023.02.12 - BETA!!!
+#define VERSION "V0.1.3"	//2023.02.12 - BETA!!!
 
 SX1268				radio = new Module(NSS, DIO1, NRST, BUSY);
 HardwareSerial		neo6m_gps(1);
@@ -146,9 +146,11 @@ void loop() {
 	static double   lastTxDistance  		= 0.0;
 	static uint32_t txInterval      		= 60000L;
 	static int      zeroSpeedCounter		= 0;
-	uint32_t 		txCommentInterval      	= 60*60*1000;	// 60 min!!!
-	uint32_t 		txMaxInterval      		= 15*60*1000;	// 15 min!
-	static bool		send_standing_update 	= false;
+	uint32_t 		txCommentInterval      	= 120*60*1000;	// 120 min!!!
+	uint32_t 		tx15mInterval      		= 15*60*1000;	// 15 min!
+	uint32_t 		tx60mInterval      		= 60*60*1000;	// 60 min!
+	static bool		sendStandingUpdate 		= false;
+	static int		standingUpdateCounter 	= 0;
 	int 			CurrentSpeed 			= (int)gps.speed.kmph();
 
 	//
@@ -168,6 +170,7 @@ void loop() {
 		if (lastTx >= txInterval) {
 			if (lastTxDistance > MinimumDistanceTx) {
 				send_update = true;
+				standingUpdateCounter = 0;
 				//
 				mensaje_test = "D:" + String(lastTxDistance) + " S:" + String(CurrentSpeed) + " I:" + String(txInterval);
 				//
@@ -183,17 +186,26 @@ void loop() {
 				}
 				if (headingDelta > TurnMinAngle && lastTxDistance > MinimumDistanceTx) {
 					send_update = true;
+					standingUpdateCounter = 0;
 					//
 					mensaje_test = "C:" + String(headingDelta) + " D:" + String(lastTxDistance) + " S:" + String(CurrentSpeed) + " I:" + String(txInterval);
 					//
 				}
 			}
 		}
-		if (!send_update && lastTx >= txMaxInterval) {
+		if (!send_update && lastTx >= tx15mInterval && standingUpdateCounter < 3) {
+				send_update = true;
+				sendStandingUpdate = true;
+				standingUpdateCounter += 1;
+				//
+				mensaje_test = "Standing Still for " + String(15*standingUpdateCounter) + "min";
+				//
+		}
+		if (!send_update && lastTx >= tx60mInterval) {
 			send_update = true;
-			send_standing_update = true;
+			sendStandingUpdate = true;
 			//
-			mensaje_test = "Standing Still";
+			mensaje_test = "Standing Still for hour(s)";
 			//
 		}
 	}
@@ -246,7 +258,7 @@ void loop() {
 				Alt1=0;
 				Alt2=0;
 			}
-			if (send_standing_update) {
+			if (sendStandingUpdate) {
 				AprsPacketMsg += " ";
 			} else {
 				AprsPacketMsg +=char(Alt1+33);
@@ -255,7 +267,7 @@ void loop() {
 			AprsPacketMsg +=char(0x30+33);
 		} else {							// ... just send Course and Speed
 			ax25_base91enc(helper_base91, 1, (uint32_t) Tcourse/4 );
-			if (send_standing_update) {
+			if (sendStandingUpdate) {
 				AprsPacketMsg += " ";
 			} else {
 				AprsPacketMsg += helper_base91[0];
@@ -271,9 +283,9 @@ void loop() {
 			if (lastCommentTx >= txCommentInterval) {
 				AprsPacketMsg += AprsComment;
 				lastCommentTxTime = millis();
-			}/* else {
+			} else {
 				AprsPacketMsg += mensaje_test;  //esto es solo para validar giro distancia y otras cosas
-			}*/
+			}
 		}
 
 		Serial.print(F("GPS coordinates: ")); 				// Only for Serial Monitor
@@ -285,6 +297,15 @@ void loop() {
 		uint16_t size = 0;
 
 		size = snprintf(reinterpret_cast<char *>(tx_buffer), sizeof tx_buffer, "\x3c\xff\x01%s>%s:%s", CurrentUser[0], AprsPath, AprsPacketMsg.c_str());
+
+		/*
+		//Esto agrega STATUS a APRS sin modificar posicion ni mensaje ni nada
+		//se puede buscar status en APRS.fi 
+		String otra_wea;
+		otra_wea = "https://github.com/richonguzman/LoRa_1W_APRS_Tracker";
+		size = snprintf(reinterpret_cast<char *>(tx_buffer), sizeof tx_buffer, "\x3c\xff\x01%s>%s:>%s", CurrentUser[0], AprsPath, otra_wea.c_str());
+		*/
+		
 
 		Serial.print(millis()); 							// Only for Serial Monitor
 		Serial.print(F(" transmitting: ")); 
