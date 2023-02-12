@@ -4,7 +4,7 @@
 #define FirstUser               1           // Select the First User at Tracker Start Up (Example: 1 means User1)
 #define AprsPath                "APLT00"    // APRS Destination (could be also "WIDE1-1" or even just "AP")
 #define AprsOverlay             "/"
-#define SendAltitude            true        // "true" adds Altitude to the APRS packet/message, "false" add Course+Speed
+#define SendAltitude            true       // "true" adds Altitude to the APRS packet/message, "false" add Course+Speed
 #define SendComment             true        // "true" adds comment to the APRS packet/message
 #define AprsComment             "https://github.com/richonguzman/LoRa_1W_APRS_Tracker"   // To send this comment --> SendComment = true (edit the comment as you like)
 
@@ -14,7 +14,7 @@
 #define User1_SlowSpeed         3           // km/h
 #define User1_FastRate          60          // seg
 #define User1_FastSpeed         15          // km/h
-#define User1_MinDistTx         5           // debe ser 100 pero esta 5 por pruebas 
+#define User1_MinDistTx         100           // debe ser 100 pero esta 5 por pruebas 
 #define User1_MinDeltaBcn       20          // seg between beacon update
 #define User1_TurnMinDeg        3           // degrees
 #define User1_TurnSlope         40          // constant

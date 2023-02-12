@@ -11,7 +11,7 @@ https://github.com/richonguzman/LoRa_1W_APRS_Tracker
 #include "lora_config.h"
 #include "beacon_config.h"
 
-#define VERSION "V0.1.1"	//2023.02.02 - BETA!!!
+#define VERSION "V0.1.2"	//2023.02.12 - BETA!!!
 
 SX1268				radio = new Module(NSS, DIO1, NRST, BUSY);
 HardwareSerial		neo6m_gps(1);
@@ -141,16 +141,20 @@ void loop() {
 	static double       previousHeading         = 0;
 	//static unsigned int rate_limit_message_text = 0;
 	
-	static double   lastTxLatitude	= 0.0;
-	static double   lastTxLongitude = 0.0;
-	static double   lastTxDistance  = 0.0;
-	static uint32_t txInterval      = 60000L;
-	uint32_t txCommentInterval      = 15*60*1000;
-	int CurrentSpeed 				= (int)gps.speed.kmph();
-	//static int      speed_zero_sent = 0;
+	static double   lastTxLatitude			= 0.0;
+	static double   lastTxLongitude 		= 0.0;
+	static double   lastTxDistance  		= 0.0;
+	static uint32_t txInterval      		= 60000L;
+	static int      zeroSpeedCounter		= 0;
+	uint32_t 		txCommentInterval      	= 60*60*1000;	// 60 min!!!
+	uint32_t 		txMaxInterval      		= 15*60*1000;	// 15 min!
+	static bool		send_standing_update 	= false;
+	int 			CurrentSpeed 			= (int)gps.speed.kmph();
 
+	//
+	String mensaje_test = "0";			// testing Serial.Monitor log
+	//
 
-	String mensaje_test = "0";
 	if (!send_update && gps_loc_update) {
 		uint32_t lastTx 			= millis() - lastTxTime;
 		int MinimumDistanceTx 		= CurrentUser[6].toInt();
@@ -164,7 +168,9 @@ void loop() {
 		if (lastTx >= txInterval) {
 			if (lastTxDistance > MinimumDistanceTx) {
 				send_update = true;
-				mensaje_test = "D:" + String(lastTxDistance) + " I:" + String(txInterval);
+				//
+				mensaje_test = "D:" + String(lastTxDistance) + " S:" + String(CurrentSpeed) + " I:" + String(txInterval);
+				//
 			}
 		}
 		if (!send_update) {
@@ -177,9 +183,18 @@ void loop() {
 				}
 				if (headingDelta > TurnMinAngle && lastTxDistance > MinimumDistanceTx) {
 					send_update = true;
-					mensaje_test = "C:" + String(headingDelta) + " D:" + String(lastTxDistance) + " I:" + String(txInterval);
+					//
+					mensaje_test = "C:" + String(headingDelta) + " D:" + String(lastTxDistance) + " S:" + String(CurrentSpeed) + " I:" + String(txInterval);
+					//
 				}
 			}
+		}
+		if (!send_update && lastTx >= txMaxInterval) {
+			send_update = true;
+			send_standing_update = true;
+			//
+			mensaje_test = "Standing Still";
+			//
 		}
 	}
 	
@@ -218,7 +233,7 @@ void loop() {
 		}
 
 		AprsPacketMsg += CurrentUser[1];	// Symbol
-
+		
 		if (SendAltitude) {					// Send Altitude or... (APRS calculates Speed also)
 			int Alt1, Alt2;
 			int Talt;
@@ -231,26 +246,34 @@ void loop() {
 				Alt1=0;
 				Alt2=0;
 			}
-			AprsPacketMsg +=char(Alt1+33);
+			if (send_standing_update) {
+				AprsPacketMsg += " ";
+			} else {
+				AprsPacketMsg +=char(Alt1+33);
+			}
 			AprsPacketMsg +=char(Alt2+33);
 			AprsPacketMsg +=char(0x30+33);
 		} else {							// ... just send Course and Speed
 			ax25_base91enc(helper_base91, 1, (uint32_t) Tcourse/4 );
-			AprsPacketMsg += helper_base91[0];
+			if (send_standing_update) {
+				AprsPacketMsg += " ";
+			} else {
+				AprsPacketMsg += helper_base91[0];
+			}
 			ax25_base91enc(helper_base91, 1, (uint32_t) (log1p(Tspeed)/0.07696));
 			AprsPacketMsg += helper_base91[0];
 			AprsPacketMsg += "\x47";	
 		}
+		
 
 		if (SendComment) {
 			uint32_t lastCommentTx = millis() - lastCommentTxTime;
 			if (lastCommentTx >= txCommentInterval) {
 				AprsPacketMsg += AprsComment;
 				lastCommentTxTime = millis();
-			} else {
+			}/* else {
 				AprsPacketMsg += mensaje_test;  //esto es solo para validar giro distancia y otras cosas
-			}
-
+			}*/
 		}
 
 		Serial.print(F("GPS coordinates: ")); 				// Only for Serial Monitor

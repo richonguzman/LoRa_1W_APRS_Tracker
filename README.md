@@ -1,9 +1,9 @@
 # LORA (1 Watt Module) APRS Tracker
 
 This LORA APRS Tracker will work with very cheep hardware (amazon, ebay or aliexpress):
-- ESP32             ( ESP32 Dev Module)
-- Ebyte E22 400M30S  (1 Watt (30dB) Lora SPI Module)
-- GY-GPSNEO6MV2     (NEO6M GPS Module)
+- ESP32 -->( ESP32 Dev Module)
+- Ebyte E22 400M30S --> (1 Watt (30dB) Lora SPI Module)
+- GY-GPSNEO6MV2 --> (NEO6M GPS Module)
 
 This project uses Enconded APRS GPS packet to extends range by saving bytes (increased battery life, higher chances of good packet reception (increased range), lower probability of packet collisions (more channel capacity) and 1 Watt LoRa Module (over the usual 0.1 Watt in commercial boards like the LILYGO T-Beam V.1).
 
@@ -11,12 +11,13 @@ ______________________________________________________________________
 
 Achievements:
 
+- force Tx with the "short" push of a button.
 - changing CALLSINGs with the "long" push of a button.
 - custom smartbeacon values for each CALLSIGN
-- force Tx with the "short" push of a button.
 - send enconded GPS data packet for shorter and realiable comunication.
 - Select to send "Course + Speed" or "Altitude + Speed" in encoded APRS data packet.
 - Use SmartBeacon with "Turn_Min + Turn_Slope" formula.
+- Zero Message when standing still for a while (not sending beacons and saving battery)
 
 To add (shortly) working on it
 
