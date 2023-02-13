@@ -41,4 +41,9 @@
 #define User3_TurnMinDeg        10
 #define User3_TurnSlope         80
 
+uint32_t    txCommentInterval   = 120*60*1000;	// 120 min!!!
+uint32_t 	tx15mInterval      	= 15*60*1000;	// 15 min!
+uint32_t 	tx60mInterval  		= 60*60*1000;	// 60 min!
+
+
 #endif

@@ -134,21 +134,14 @@ void loop() {
 	while (neo6m_gps.available() > 0) {
 		gps.encode(neo6m_gps.read());
 	}
-	bool 		gps_loc_update 	= gps.location.isUpdated();
-	bool        gps_time_update = gps.time.isUpdated();
-	//static time_t nextBeaconTimeStamp = -1;
-	static double       currentHeading          = 0;
-	static double       previousHeading         = 0;
-	//static unsigned int rate_limit_message_text = 0;
-	
+	bool 			gps_loc_update 			= gps.location.isUpdated();
+	bool        	gps_time_update 		= gps.time.isUpdated();
+	static double	currentHeading          = 0;
+	static double	previousHeading         = 0;
 	static double   lastTxLatitude			= 0.0;
 	static double   lastTxLongitude 		= 0.0;
 	static double   lastTxDistance  		= 0.0;
 	static uint32_t txInterval      		= 60000L;
-	static int      zeroSpeedCounter		= 0;
-	uint32_t 		txCommentInterval      	= 120*60*1000;	// 120 min!!!
-	uint32_t 		tx15mInterval      		= 15*60*1000;	// 15 min!
-	uint32_t 		tx60mInterval      		= 60*60*1000;	// 60 min!
 	static bool		sendStandingUpdate 		= false;
 	static int		standingUpdateCounter 	= 0;
 	int 			CurrentSpeed 			= (int)gps.speed.kmph();
