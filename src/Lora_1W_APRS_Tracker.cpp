@@ -193,7 +193,7 @@ void loop() {
 				}
 			}
 		}
-		if (!send_update && lastTx >= tx15mInterval && standingUpdateCounter < 3) {
+		if (!send_update && lastTx >= tx15mInterval && standingUpdateCounter < 4) {
 				send_update = true;
 				sendStandingUpdate = true;
 				standingUpdateCounter += 1;
@@ -205,7 +205,7 @@ void loop() {
 			send_update = true;
 			sendStandingUpdate = true;
 			//
-			mensaje_test = "Standing Still for hour(s)";
+			mensaje_test = "Standing Still for hours";
 			//
 		}
 	}
