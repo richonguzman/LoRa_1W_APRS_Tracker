@@ -14,8 +14,8 @@
 #define User1_SlowSpeed         3           // km/h
 #define User1_FastRate          60          // seg
 #define User1_FastSpeed         15          // km/h
-#define User1_MinDistTx         100           // debe ser 100 pero esta 5 por pruebas 
-#define User1_MinDeltaBcn       20          // seg between beacon update
+#define User1_MinDistTx         20          // TESTING VALUE -> should be 100mts 
+#define User1_MinDeltaBcn       10          // seg between beacon update
 #define User1_TurnMinDeg        3           // degrees
 #define User1_TurnSlope         40          // constant
 
