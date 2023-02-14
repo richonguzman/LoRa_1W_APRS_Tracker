@@ -1,7 +1,7 @@
 #ifndef BEACON_CONFIG_H_
 #define BEACON_CONFIG_H_
 
-#define FirstUser               1           // Select the First User at Tracker Start Up (Example: 1 means User1)
+#define FirstUser               3           // Select the First User at Tracker Start Up (Example: 1 means User1)
 #define AprsPath                "APLT00"    // APRS Destination (could be also "WIDE1-1" or even just "AP")
 #define AprsOverlay             "/"
 #define SendAltitude            true       // "true" adds Altitude to the APRS packet/message, "false" add Course+Speed
@@ -14,7 +14,7 @@
 #define User1_SlowSpeed         3           // km/h
 #define User1_FastRate          60          // seg
 #define User1_FastSpeed         15          // km/h
-#define User1_MinDistTx         20          // TESTING VALUE -> should be 100mts 
+#define User1_MinDistTx         30          // TESTING VALUE -> should be 100mts 
 #define User1_MinDeltaBcn       10          // seg between beacon update
 #define User1_TurnMinDeg        3           // degrees
 #define User1_TurnSlope         40          // constant
@@ -36,7 +36,7 @@
 #define User3_SlowSpeed         10
 #define User3_FastRate          60
 #define User3_FastSpeed         70
-#define User3_MinDistTx         100
+#define User3_MinDistTx         30
 #define User3_MinDeltaBcn       8
 #define User3_TurnMinDeg        10
 #define User3_TurnSlope         80
