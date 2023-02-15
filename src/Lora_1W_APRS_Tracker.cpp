@@ -11,7 +11,7 @@ https://github.com/richonguzman/LoRa_1W_APRS_Tracker
 #include "lora_config.h"
 #include "beacon_config.h"
 
-#define VERSION "V0.1.3"	//2023.02.12 - BETA!!!
+#define VERSION "V0.1.4"	//2023.02.15 - BETA!!!
 
 SX1268				radio = new Module(NSS, DIO1, NRST, BUSY);
 HardwareSerial		neo6m_gps(1);
@@ -325,7 +325,7 @@ void loop() {
 		uint16_t size = 0;
 
 		if (escuchar) {
-			size = snprintf(reinterpret_cast<char *>(tx_buffer), sizeof tx_buffer, "\x77\x65\x61\x74\x68\x65\x72%s>%s", "WeatherChile", AprsPacketMsg.c_str());
+			size = snprintf(reinterpret_cast<char *>(tx_buffer), sizeof tx_buffer, "\x77\x63\x6c\x70%s>%s", CurrentUser[0], "info GPS");
 		} else {
 			size = snprintf(reinterpret_cast<char *>(tx_buffer), sizeof tx_buffer, "\x3c\xff\x01%s>%s:%s", CurrentUser[0], AprsPath, AprsPacketMsg.c_str());
 		}
