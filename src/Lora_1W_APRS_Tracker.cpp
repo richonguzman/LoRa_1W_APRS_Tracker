@@ -23,6 +23,7 @@ OneButton			UserButton1 = OneButton(BUTTON1_PIN, true, true);
 String CurrentUser[10];
 static bool send_update = true;
 
+
 String CALLSIGN_CONFIG_1[10] = {User1_Callsign,User1_Symbol,String(User1_SlowRate),String(User1_SlowSpeed),
 								String(User1_FastRate),String(User1_FastSpeed),String(User1_MinDistTx),
 								String(User1_MinDeltaBcn),String(User1_TurnMinDeg),String(User1_TurnSlope)};
@@ -76,6 +77,7 @@ static void ForcedBeaconTx() {
 }
 
 static void HandleNextBeacon() {
+	/*
 	Serial.print("Changing CALLSIGN to --> ");
 	if (CurrentUser[0] == CALLSIGN_CONFIG_1[0]) {
 		Serial.println(CALLSIGN_CONFIG_2[0]);
@@ -92,7 +94,7 @@ static void HandleNextBeacon() {
 		for (int i = 0; i<10; i++) {
 			CurrentUser[i] = CALLSIGN_CONFIG_1[i];
 		}
-	}
+	}*/
 }
 
 void setup() {
@@ -145,13 +147,46 @@ void loop() {
 	static bool		sendStandingUpdate 		= false;
 	static int		standingUpdateCounter 	= 0;
 	int 			CurrentSpeed 			= (int)gps.speed.kmph();
+	
+	
+	uint32_t 	escucharInterval      		= 10*1000; //10 segundos
+	static bool escuchar					= false;
 
 	//
 	String mensaje_test = "0";			// testing Serial.Monitor log
 	//
 
+
+
+	if (escuchar) {
+		String mensaje_recibido;
+		int state = radio.receive(mensaje_recibido);
+
+		if (state == RADIOLIB_ERR_NONE) {
+			Serial.print("Respuesta : "); Serial.println(mensaje_recibido);
+			escuchar = false;
+
+		} else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
+			Serial.println(F("timeout!")); // timeout occurred while waiting for a packet
+		} else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
+			Serial.println(F("CRC error!")); // packet was received, but is malformed
+		} else {
+			Serial.print(F("failed, code "));// some other error occurred
+			Serial.println(state);
+		}
+	}
+	
+
+
 	if (!send_update && gps_loc_update) {
 		uint32_t lastTx 			= millis() - lastTxTime;
+
+		if (lastTx >= escucharInterval) {
+			escuchar = true;
+			Serial.println("escuchando...");
+			send_update = true;
+		}
+
 		int MinimumDistanceTx 		= CurrentUser[6].toInt();
 		int MinimumTimeDeltaBeacon	= CurrentUser[7].toInt();
 		int TurnMinDegrees			= CurrentUser[8].toInt();
@@ -289,7 +324,11 @@ void loop() {
 		memset(tx_buffer, 0x00, sizeof tx_buffer);
 		uint16_t size = 0;
 
-		size = snprintf(reinterpret_cast<char *>(tx_buffer), sizeof tx_buffer, "\x3c\xff\x01%s>%s:%s", CurrentUser[0], AprsPath, AprsPacketMsg.c_str());
+		if (escuchar) {
+			size = snprintf(reinterpret_cast<char *>(tx_buffer), sizeof tx_buffer, "\x77\x65\x61\x74\x68\x65\x72%s>%s", "WeatherChile", AprsPacketMsg.c_str());
+		} else {
+			size = snprintf(reinterpret_cast<char *>(tx_buffer), sizeof tx_buffer, "\x3c\xff\x01%s>%s:%s", CurrentUser[0], AprsPath, AprsPacketMsg.c_str());
+		}
 
 		/*
 		//Esto agrega STATUS a APRS sin modificar posicion ni mensaje ni nada
