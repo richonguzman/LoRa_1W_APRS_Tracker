@@ -77,7 +77,6 @@ static void ForcedBeaconTx() {
 }
 
 static void HandleNextBeacon() {
-	/*
 	Serial.print("Changing CALLSIGN to --> ");
 	if (CurrentUser[0] == CALLSIGN_CONFIG_1[0]) {
 		Serial.println(CALLSIGN_CONFIG_2[0]);
@@ -94,7 +93,7 @@ static void HandleNextBeacon() {
 		for (int i = 0; i<10; i++) {
 			CurrentUser[i] = CALLSIGN_CONFIG_1[i];
 		}
-	}*/
+	}
 }
 
 void setup() {
@@ -156,8 +155,6 @@ void loop() {
 	String mensaje_test = "0";			// testing Serial.Monitor log
 	//
 
-
-
 	if (escuchar) {
 		String mensaje_recibido;
 		int state = radio.receive(mensaje_recibido);
@@ -181,11 +178,13 @@ void loop() {
 	if (!send_update && gps_loc_update) {
 		uint32_t lastTx 			= millis() - lastTxTime;
 
+		/*
 		if (lastTx >= escucharInterval) {
 			escuchar = true;
 			Serial.println("escuchando...");
 			send_update = true;
 		}
+		*/
 
 		int MinimumDistanceTx 		= CurrentUser[6].toInt();
 		int MinimumTimeDeltaBeacon	= CurrentUser[7].toInt();
