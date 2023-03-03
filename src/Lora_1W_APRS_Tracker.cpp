@@ -155,37 +155,25 @@ void loop() {
 	String mensaje_test = "0";			// testing Serial.Monitor log
 	//
 
-	if (escuchar) {
-		String mensaje_recibido;
-		int state = radio.receive(mensaje_recibido);
 
-		if (state == RADIOLIB_ERR_NONE) {
-			Serial.print("Respuesta : "); Serial.println(mensaje_recibido);
-			escuchar = false;
+	/*String mensaje_recibido;
+	int state = radio.receive(mensaje_recibido);
 
-		} else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
-			Serial.println(F("timeout!")); // timeout occurred while waiting for a packet
-		} else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
-			Serial.println(F("CRC error!")); // packet was received, but is malformed
-		} else {
-			Serial.print(F("failed, code "));// some other error occurred
-			Serial.println(state);
-		}
-	}
+	if (state == RADIOLIB_ERR_NONE) {
+		Serial.print("Respuesta : "); Serial.println(mensaje_recibido);
+	} else if (state == RADIOLIB_ERR_RX_TIMEOUT) {
+		Serial.println(F("timeout!")); // timeout occurred while waiting for a packet
+	} else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
+		Serial.println(F("CRC error!")); // packet was received, but is malformed
+	} else {
+		Serial.print(F("failed, code "));// some other error occurred
+		Serial.println(state);
+	}*/
 	
 
 
 	if (!send_update && gps_loc_update) {
 		uint32_t lastTx 			= millis() - lastTxTime;
-
-		/*
-		if (lastTx >= escucharInterval) {
-			escuchar = true;
-			Serial.println("escuchando...");
-			send_update = true;
-		}
-		*/
-
 		int MinimumDistanceTx 		= CurrentUser[6].toInt();
 		int MinimumTimeDeltaBeacon	= CurrentUser[7].toInt();
 		int TurnMinDegrees			= CurrentUser[8].toInt();
@@ -237,6 +225,48 @@ void loop() {
 		}
 	}
 	
+	if (!send_update) {
+		String loraReceivedPacket, primera_parte , mensajero, ultima_parte, destinatario, mensaje, ackNumber, respuesta_ack;
+		int state = radio.receive(loraReceivedPacket);// readData(mensaje_recibido);
+
+		if (state == RADIOLIB_ERR_NONE) {
+			Serial.print(loraReceivedPacket);
+			primera_parte = loraReceivedPacket.substring(loraReceivedPacket.indexOf("}")+1);
+			mensajero = primera_parte.substring(0, primera_parte.indexOf(">"));
+			ultima_parte = loraReceivedPacket.substring(loraReceivedPacket.indexOf("::")+2);
+			destinatario = ultima_parte.substring(0,ultima_parte.indexOf(":"));
+			destinatario.trim();
+			mensaje = ultima_parte.substring(ultima_parte.indexOf(":")+1);
+			if (destinatario == CurrentUser[0]) {
+				if (mensaje.indexOf("{")>0) {
+					//Serial.println("solicita ack");
+					ackNumber = mensaje.substring(mensaje.indexOf("{")+1);
+					//Serial.println(ackNumber);
+					for(int i = mensajero.length(); i < 9; i++) {
+						mensajero += ' ';
+					}
+					respuesta_ack = CurrentUser[0] + ">APLT00::" + mensajero + ":ack" + ackNumber;
+					//Serial.print(respuesta_ack);
+					memset(tx_buffer, 0x00, sizeof tx_buffer);
+					uint16_t sizeMessage = 0;
+					sizeMessage = snprintf(reinterpret_cast<char *>(tx_buffer), sizeof tx_buffer, "\x3c\xff\x01%s", respuesta_ack.c_str());
+					radio.transmit(tx_buffer, sizeMessage);
+					radio.finishTransmit();
+					Serial.println("respondido ACK");
+				}
+				String saludo;
+				saludo = CurrentUser[0] + ">APLT00::" + mensajero + ":" + "Hola para ti tambien" + "\n";
+				memset(tx_buffer, 0x00, sizeof tx_buffer);
+				uint16_t sizeMessage = 0;
+				sizeMessage = snprintf(reinterpret_cast<char *>(tx_buffer), sizeof tx_buffer, "\x3c\xff\x01%s", saludo.c_str());
+				radio.transmit(tx_buffer, sizeMessage);
+				radio.finishTransmit();
+				Serial.println("saludo respondido");
+
+			}
+		}
+	}
+
 	if (send_update && gps_loc_update) {
 		float Tlat, Tlon;
 		float Tspeed=0, Tcourse=0;
